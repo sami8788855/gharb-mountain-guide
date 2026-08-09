@@ -6,93 +6,823 @@
 
 <title>دليل الجبل الغربي</title>
 
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
 <style>
-body{
-    margin:0;
-    font-family:Arial;
-    background:#f2f2f2;
+* {
+  box-sizing: border-box;
 }
 
-header{
-    background:#174734;
-    color:white;
-    padding:15px;
-    text-align:center;
-    font-size:22px;
+html {
+  scroll-behavior: smooth;
 }
 
-.menu{
-    background:white;
-    margin:15px;
-    padding:15px;
-    border-radius:10px;
+body {
+  margin: 0;
+  font-family: Arial, Tahoma, sans-serif;
+  background: #f3f5f4;
+  color: #222;
 }
 
-button{
-    background:#174734;
-    color:white;
-    border:0;
-    padding:10px;
-    border-radius:8px;
+/* ===== الرأس ===== */
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #174734;
+  color: white;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
 }
 
-#map{
-    margin:15px;
-    height:300px;
-    background:#ddd;
-    border-radius:15px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:25px;
+.header-content {
+  max-width: 1100px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.card{
-    background:white;
-    margin:15px;
-    padding:15px;
-    border-radius:10px;
+.menu-button {
+  background: white;
+  color: #174734;
+  border: 0;
+  border-radius: 9px;
+  padding: 10px 13px;
+  font-size: 20px;
+  cursor: pointer;
 }
 
+.logo-title {
+  flex: 1;
+}
+
+.logo-title h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.logo-title p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  opacity: .85;
+}
+
+.search-box {
+  width: 210px;
+  border: 0;
+  border-radius: 20px;
+  padding: 10px 14px;
+  outline: none;
+}
+
+/* ===== القائمة ===== */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: -310px;
+  width: 290px;
+  height: 100vh;
+  background: white;
+  z-index: 3000;
+  box-shadow: -3px 0 15px rgba(0,0,0,.25);
+  transition: right .3s ease;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.sidebar.open {
+  right: 0;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 12px;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  color: #174734;
+}
+
+.close-button {
+  background: #eee;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.service-button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 13px;
+  border: 0;
+  border-radius: 10px;
+  background: #174734;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: right;
+}
+
+.service-button:hover {
+  opacity: .9;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  z-index: 2500;
+}
+
+.overlay.show {
+  display: block;
+}
+
+/* ===== المحتوى ===== */
+
+.container {
+  width: 94%;
+  max-width: 1100px;
+  margin: 18px auto 40px;
+}
+
+.welcome {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.welcome h2 {
+  margin-top: 0;
+  color: #174734;
+}
+
+.welcome p {
+  line-height: 1.8;
+}
+
+/* ===== الخدمات ===== */
+
+.section-title {
+  color: #174734;
+  margin: 20px 0 10px;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.service-card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  transition: transform .2s;
+}
+
+.service-card:hover {
+  transform: translateY(-2px);
+}
+
+.service-icon {
+  font-size: 28px;
+}
+
+.service-card h3 {
+  margin: 8px 0 5px;
+  color: #174734;
+}
+
+.service-card p {
+  margin: 0;
+  color: #666;
+  font-size: 13px;
+}
+
+/* ===== الخريطة ===== */
+
+.map-section {
+  margin-top: 22px;
+  background: white;
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.map-section h2 {
+  color: #174734;
+  margin: 5px 8px 12px;
+}
+
+#map {
+  width: 100%;
+  height: 430px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* ===== بطاقات الأماكن ===== */
+
+.places {
+  margin-top: 22px;
+}
+
+.place-card {
+  background: white;
+  border-radius: 14px;
+  padding: 15px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 7px rgba(0,0,0,.07);
+}
+
+.place-card h3 {
+  margin-top: 0;
+  color: #174734;
+}
+
+.place-card p {
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+
+/* ===== رسالة البحث ===== */
+
+.no-results {
+  display: none;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  color: #777;
+  margin-top: 15px;
+}
+
+/* ===== الهاتف ===== */
+
+@media (max-width: 800px) {
+
+  .header-content {
+    flex-wrap: wrap;
+  }
+
+  .logo-title {
+    min-width: 0;
+  }
+
+  .search-box {
+    order: 3;
+    width: 100%;
+  }
+
+  .services-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #map {
+    height: 360px;
+  }
+}
+
+@media (max-width: 450px) {
+
+  .logo-title h1 {
+    font-size: 16px;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .service-card {
+    padding: 12px;
+  }
+
+  #map {
+    height: 320px;
+  }
+}
 </style>
-
 </head>
 
 <body>
 
+<!-- ===== الرأس ===== -->
+
 <header>
-⛰️ دليل الجبل الغربي
+
+  <div class="header-content">
+
+    <button
+      class="menu-button"
+      onclick="openMenu()"
+      aria-label="فتح الخدمات">
+      ☰
+    </button>
+
+    <div class="logo-title">
+      <h1>⛰️ دليل الجبل الغربي</h1>
+      <p>دليلك لاكتشاف مدن وخدمات الجبل الغربي</p>
+    </div>
+
+    <input
+      id="search"
+      class="search-box"
+      type="search"
+      placeholder="🔎 ابحث عن مدينة أو خدمة..."
+      oninput="searchSite()"
+    >
+
+  </div>
+
 </header>
 
 
-<div class="menu">
+<!-- ===== القائمة الجانبية ===== -->
 
-<button onclick="alert('الخدمات تعمل')">
-☰ الخدمات
-</button>
+<div id="overlay" class="overlay" onclick="closeMenu()"></div>
 
-</div>
+<aside id="sidebar" class="sidebar">
+
+  <div class="sidebar-header">
+    <h2>الخدمات</h2>
+
+    <button
+      class="close-button"
+      onclick="closeMenu()">
+      ✕
+    </button>
+  </div>
+
+  <button class="service-button" onclick="showService('الصحة')">
+    🏥 الصحة
+  </button>
+
+  <button class="service-button" onclick="showService('الوقود')">
+    ⛽ الوقود والغاز
+  </button>
+
+  <button class="service-button" onclick="showService('الأسواق')">
+    🛒 الأسواق
+  </button>
+
+  <button class="service-button" onclick="showService('الإقامة')">
+    🏨 الإقامة
+  </button>
+
+  <button class="service-button" onclick="showService('المطاعم')">
+    🍽️ المطاعم
+  </button>
+
+  <button class="service-button" onclick="showService('السياحة')">
+    🏛️ السياحة
+  </button>
+
+  <button class="service-button" onclick="showService('المساجد')">
+    🕌 المساجد
+  </button>
+
+  <button class="service-button" onclick="showService('النقل')">
+    🚕 النقل
+  </button>
+
+</aside>
 
 
+<!-- ===== المحتوى الرئيسي ===== -->
+
+<main class="container">
+
+  <section class="welcome">
+
+    <h2>مرحبًا بك في دليل الجبل الغربي</h2>
+
+    <p>
+      منصة تجريبية للتعريف بمدن ومناطق وخدمات الجبل الغربي
+      في ليبيا، مع خريطة تفاعلية تساعدك على استكشاف المنطقة.
+    </p>
+
+  </section>
 
 
-<div class="card">
+  <!-- ===== الخدمات ===== -->
 
-<h3>الخدمات</h3>
+  <h2 class="section-title">الخدمات الرئيسية</h2>
 
-<p>🏥 الصحة</p>
-<p>⛽ الوقود</p>
-<p>🛒 الأسواق</p>
-<p>🏨 الإقامة</p>
-<p>🍽️ المطاعم</p>
+  <section class="services-grid">
 
-</div>
+    <div
+      class="service-card searchable"
+      data-search="الصحة مستشفى عيادة صيدلية"
+      onclick="showService('الصحة')">
+
+      <div class="service-icon">🏥</div>
+      <h3>الصحة</h3>
+      <p>المستشفيات والعيادات والصيدليات</p>
+
+    </div>
 
 
-<div id="map">
-🗺️ مكان الخريطة
-</div>
+    <div
+      class="service-card searchable"
+      data-search="الوقود الغاز محطة بنزين"
+      onclick="showService('الوقود')">
 
+      <div class="service-icon">⛽</div>
+      <h3>الوقود</h3>
+      <p>محطات الوقود والغاز</p>
+
+    </div>
+
+
+    <div
+      class="service-card searchable"
+      data-search="الأسواق محلات تجارة"
+      onclick="showService('الأسواق')">
+
+      <div class="service-icon">🛒</div>
+      <h3>الأسواق</h3>
+      <p>الأسواق والمحلات التجارية</p>
+
+    </div>
+
+
+    <div
+      class="service-card searchable"
+      data-search="الإقامة فنادق شقق"
+      onclick="showService('الإقامة')">
+
+      <div class="service-icon">🏨</div>
+      <h3>الإقامة</h3>
+      <p>الفنادق وأماكن الإقامة</p>
+
+    </div>
+
+
+    <div
+      class="service-card searchable"
+      data-search="المطاعم أكل مقاهي"
+      onclick="showService('المطاعم')">
+
+      <div class="service-icon">🍽️</div>
+      <h3>المطاعم</h3>
+      <p>المطاعم والمقاهي</p>
+
+    </div>
+
+
+    <div
+      class="service-card searchable"
+      data-search="السياحة أماكن سياحية آثار"
+      onclick="showService('السياحة')">
+
+      <div class="service-icon">🏛️</div>
+      <h3>السياحة</h3>
+      <p>الأماكن السياحية والأثرية</p>
+
+    </div>
+
+
+    <div
+      class="service-card searchable"
+      data-search="المساجد جامع مسجد"
+      onclick="showService('المساجد')">
+
+      <div class="service-icon">🕌</div>
+      <h3>المساجد</h3>
+      <p>المساجد والجوامع</p>
+
+    </div>
+
+
+    <div
+      class="service-card searchable"
+      data-search="النقل سيارات تاكسي مواصلات"
+      onclick="showService('النقل')">
+
+      <div class="service-icon">🚕</div>
+      <h3>النقل</h3>
+      <p>المواصلات وسيارات الأجرة</p>
+
+    </div>
+
+  </section>
+
+
+  <!-- ===== الخريطة الوحيدة ===== -->
+
+  <section class="map-section">
+
+    <h2>🗺️ خريطة الجبل الغربي</h2>
+
+    <div id="map"></div>
+
+  </section>
+
+
+  <!-- ===== المدن ===== -->
+
+  <section class="places">
+
+    <h2 class="section-title">مدن الجبل الغربي</h2>
+
+
+    <div
+      class="place-card searchable"
+      data-search="غريان غريان الجبل الغربي">
+
+      <h3>📍 غريان</h3>
+
+      <p>
+        من أبرز مدن الجبل الغربي، وتظهر على الخريطة.
+      </p>
+
+    </div>
+
+
+    <div
+      class="place-card searchable"
+      data-search="يفرن يفرن الجبل الغربي">
+
+      <h3>📍 يفرن</h3>
+
+      <p>
+        مدينة من مدن الجبل الغربي وتظهر على الخريطة.
+      </p>
+
+    </div>
+
+
+    <div
+      class="place-card searchable"
+      data-search="الزنتان الزنتان الجبل الغربي">
+
+      <h3>📍 الزنتان</h3>
+
+      <p>
+        من مدن منطقة الجبل الغربي.
+      </p>
+
+    </div>
+
+
+    <div
+      class="place-card searchable"
+      data-search="نالوت نالوت الجبل الغربي">
+
+      <h3>📍 نالوت</h3>
+
+      <p>
+        مدينة تاريخية في غرب الجبل الغربي.
+      </p>
+
+    </div>
+
+
+    <div
+      class="place-card searchable"
+      data-search="جادو جادو الجبل الغربي">
+
+      <h3>📍 جادو</h3>
+
+      <p>
+        مدينة من مدن الجبل الغربي.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <div id="noResults" class="no-results">
+    لم نجد نتائج مطابقة للبحث.
+  </div>
+
+</main>
+
+
+<!-- ===== Leaflet ===== -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
+<script>
+
+/* =========================
+   القائمة
+========================= */
+
+function openMenu() {
+
+  document
+    .getElementById("sidebar")
+    .classList
+    .add("open");
+
+  document
+    .getElementById("overlay")
+    .classList
+    .add("show");
+}
+
+
+function closeMenu() {
+
+  document
+    .getElementById("sidebar")
+    .classList
+    .remove("open");
+
+  document
+    .getElementById("overlay")
+    .classList
+    .remove("show");
+}
+
+
+/* =========================
+   الخدمات
+========================= */
+
+function showService(service) {
+
+  closeMenu();
+
+  alert(
+    "قسم " + service +
+    "\n\nسيتم إضافة الأماكن والبيانات الخاصة بهذا القسم في المرحلة القادمة."
+  );
+}
+
+
+/* =========================
+   الخريطة
+========================= */
+
+var map = L.map("map").setView(
+  [32.05, 12.60],
+  8
+);
+
+
+L.tileLayer(
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap contributors"
+  }
+).addTo(map);
+
+
+/* =========================
+   مدن الجبل الغربي
+========================= */
+
+var cities = [
+
+  {
+    name: "غريان",
+    lat: 32.172,
+    lng: 13.020
+  },
+
+  {
+    name: "يفرن",
+    lat: 32.063,
+    lng: 12.528
+  },
+
+  {
+    name: "الزنتان",
+    lat: 31.931,
+    lng: 12.250
+  },
+
+  {
+    name: "نالوت",
+    lat: 31.860,
+    lng: 10.980
+  },
+
+  {
+    name: "جادو",
+    lat: 31.955,
+    lng: 12.020
+  }
+
+];
+
+
+cities.forEach(function(city) {
+
+  var marker = L.marker([
+    city.lat,
+    city.lng
+  ]).addTo(map);
+
+  marker.bindPopup(
+    "<strong>📍 " +
+    city.name +
+    "</strong><br>" +
+    "مدينة من مدن الجبل الغربي"
+  );
+
+});
+
+
+/* =========================
+   البحث
+========================= */
+
+function searchSite() {
+
+  var query =
+    document
+      .getElementById("search")
+      .value
+      .trim()
+      .toLowerCase();
+
+  var items =
+    document.querySelectorAll(".searchable");
+
+  var found = 0;
+
+
+  items.forEach(function(item) {
+
+    var text =
+      (
+        item.innerText +
+        " " +
+        item.dataset.search
+      ).toLowerCase();
+
+
+    if (
+      query === "" ||
+      text.includes(query)
+    ) {
+
+      item.style.display = "";
+
+      found++;
+
+    } else {
+
+      item.style.display = "none";
+
+    }
+
+  });
+
+
+  document
+    .getElementById("noResults")
+    .style.display =
+      found === 0 ? "block" : "none";
+}
+
+
+/* =========================
+   إصلاح حجم الخريطة
+========================= */
+
+window.addEventListener(
+  "load",
+  function() {
+
+    setTimeout(
+      function() {
+
+        map.invalidateSize();
+
+      },
+      300
+    );
+
+  }
+);
+
+</script>
 
 </body>
 </html>
