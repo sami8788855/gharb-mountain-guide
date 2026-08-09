@@ -1,12 +1,1125 @@
-<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <!-- Stylized Mountain (Jabal) -->
-  <path d="M40 140 L100 60 L160 140" fill="none" stroke="#1d4ed8" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M70 140 L100 100 L130 140" fill="none" stroke="#00AD4F" stroke-width="8" stroke-linejoin="round"/>
-  
-  <!-- Location Pin / Service Point -->
-  <circle cx="100" cy="50" r="15" fill="#ef4444" />
-  <circle cx="100" cy="50" r="6" fill="white" />
-  
-  <!-- Horizontal Base Line -->
-  <line x1="30" y1="150" x2="170" y2="150" stroke="#d9dadb" stroke-width="4" stroke-linecap="round"/>
-</svg>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>دليل الجبل الغربي</title>
+
+  <meta name="description" content="دليل الجبل الغربي - دليل تفاعلي للأماكن والخدمات والسياحة والطرق">
+
+  <!-- Leaflet Map -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  >
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: Arial, Tahoma, sans-serif;
+      background: #f4f6f8;
+      color: #17202a;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    button,
+    input {
+      font-family: inherit;
+    }
+
+    /* ===== HEADER ===== */
+
+    header {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      height: 64px;
+      background: #173f35;
+      color: white;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      padding: 0 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.2);
+    }
+
+    .brand {
+      font-size: 20px;
+      font-weight: bold;
+      white-space: nowrap;
+      margin-left: 15px;
+    }
+
+    .brand small {
+      display: block;
+      font-size: 10px;
+      font-weight: normal;
+      opacity: .8;
+    }
+
+    .search-box {
+      flex: 1;
+      max-width: 600px;
+      margin: auto;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      border: none;
+      outline: none;
+      border-radius: 25px;
+      padding: 12px 45px 12px 15px;
+      font-size: 15px;
+      background: white;
+      color: #222;
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 15px;
+      top: 9px;
+      font-size: 20px;
+      color: #555;
+    }
+
+    .header-btn {
+      border: none;
+      background: rgba(255,255,255,.15);
+      color: white;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 19px;
+      margin-right: 8px;
+    }
+
+    .header-btn:hover {
+      background: rgba(255,255,255,.25);
+    }
+
+    /* ===== SIDEBAR ===== */
+
+    .sidebar {
+      position: fixed;
+      top: 64px;
+      right: 0;
+      bottom: 0;
+      width: 280px;
+      background: white;
+      z-index: 1500;
+      overflow-y: auto;
+      box-shadow: -3px 0 12px rgba(0,0,0,.12);
+      transition: transform .3s ease;
+    }
+
+    .sidebar-title {
+      padding: 18px 18px 10px;
+      font-weight: bold;
+      font-size: 18px;
+      color: #173f35;
+    }
+
+    .category {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: calc(100% - 20px);
+      margin: 5px 10px;
+      padding: 13px;
+      border: none;
+      background: #f7f8f8;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: right;
+      font-size: 14px;
+      color: #222;
+    }
+
+    .category:hover {
+      background: #e8efec;
+    }
+
+    .category-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #173f35;
+      color: white;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .category-text strong {
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .category-text span {
+      color: #777;
+      font-size: 11px;
+    }
+
+    /* ===== MAP ===== */
+
+    #map {
+      position: fixed;
+      top: 64px;
+      right: 280px;
+      left: 0;
+      bottom: 0;
+      z-index: 1;
+    }
+
+    /* ===== BOTTOM PANEL ===== */
+
+    .bottom-panel {
+      position: fixed;
+      bottom: 18px;
+      right: 300px;
+      left: 20px;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .info-card {
+      pointer-events: auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.18);
+      padding: 15px 20px;
+      max-width: 650px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .info-card strong {
+      color: #173f35;
+      font-size: 16px;
+    }
+
+    .info-card p {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: #666;
+    }
+
+    /* ===== MOBILE MENU ===== */
+
+    .mobile-menu {
+      display: none;
+    }
+
+    /* ===== DARK MODE ===== */
+
+    body.dark {
+      background: #111;
+      color: #eee;
+    }
+
+    body.dark .sidebar,
+    body.dark .info-card {
+      background: #1c1f20;
+      color: #eee;
+    }
+
+    body.dark .category {
+      background: #292d2e;
+      color: #eee;
+    }
+
+    body.dark .category:hover {
+      background: #353a3b;
+    }
+
+    body.dark .category-text span,
+    body.dark .info-card p {
+      color: #aaa;
+    }
+
+    /* ===== SEARCH RESULTS ===== */
+
+    .search-results {
+      position: absolute;
+      top: 52px;
+      right: 0;
+      left: 0;
+      background: white;
+      color: #222;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,.2);
+      overflow: hidden;
+      display: none;
+      max-height: 350px;
+      overflow-y: auto;
+      z-index: 3000;
+    }
+
+    .result {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+    }
+
+    .result:hover {
+      background: #f3f5f5;
+    }
+
+    .result strong {
+      display: block;
+    }
+
+    .result span {
+      font-size: 11px;
+      color: #777;
+    }
+
+    /* ===== RESPONSIVE ===== */
+
+    @media (max-width: 800px) {
+
+      header {
+        height: 58px;
+      }
+
+      .brand {
+        font-size: 16px;
+        margin-left: 8px;
+      }
+
+      .brand small {
+        display: none;
+      }
+
+      .search-box {
+        max-width: none;
+      }
+
+      .header-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 17px;
+      }
+
+      .sidebar {
+        top: 58px;
+        width: 270px;
+        transform: translateX(100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      #map {
+        top: 58px;
+        right: 0;
+      }
+
+      .bottom-panel {
+        right: 10px;
+        left: 10px;
+        bottom: 10px;
+      }
+
+      .mobile-menu {
+        display: block;
+      }
+    }
+
+    /* ===== LOADING ===== */
+
+    .loading {
+      position: fixed;
+      inset: 0;
+      background: #173f35;
+      color: white;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: opacity .5s;
+    }
+
+    .loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: white;
+      color: #173f35;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      margin-bottom: 18px;
+    }
+
+    .loading h1 {
+      margin: 0;
+      font-size: 25px;
+    }
+
+    .loading p {
+      opacity: .8;
+      margin-top: 8px;
+    }
+
+    /* ===== LOCATE BUTTON ===== */
+
+    .locate-btn {
+      position: fixed;
+      bottom: 95px;
+      left: 20px;
+      z-index: 1200;
+      width: 48px;
+      height: 48px;
+      border: none;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 3px 12px rgba(0,0,0,.25);
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 800px) {
+      .locate-btn {
+        bottom: 105px;
+        left: 15px;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- شاشة التحميل -->
+  <div class="loading" id="loading">
+    <div class="loading-logo">⛰️</div>
+    <h1>دليل الجبل الغربي</h1>
+    <p>جاري تحميل الدليل...</p>
+  </div>
+
+  <!-- الهيدر -->
+  <header>
+
+    <button
+      class="header-btn mobile-menu"
+      id="menuBtn"
+      title="القائمة"
+    >
+      ☰
+    </button>
+
+    <div class="brand">
+      دليل الجبل الغربي
+      <small>منصة الأماكن والخدمات</small>
+    </div>
+
+    <div class="search-box">
+
+      <span class="search-icon">🔎</span>
+
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="ابحث عن مكان أو خدمة..."
+        autocomplete="off"
+      >
+
+      <div class="search-results" id="searchResults"></div>
+
+    </div>
+
+    <button
+      class="header-btn"
+      id="darkBtn"
+      title="الوضع الليلي"
+    >
+      🌙
+    </button>
+
+  </header>
+
+  <!-- القائمة الجانبية -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-title">
+      الأقسام
+    </div>
+
+    <button class="category" data-category="all">
+      <div class="category-icon">🗺️</div>
+      <div class="category-text">
+        <strong>كل الأماكن</strong>
+        <span>عرض جميع الأماكن</span>
+      </div>
+    </button>
+
+    <button class="category" data-category="health">
+      <div class="category-icon">🏥</div>
+      <div class="category-text">
+        <strong>الصحة</strong>
+        <span>مستشفيات وعيادات وصيدليات</span>
+      </div>
+    </button>
+
+    <button class="category" data-category="fuel">
+      <div class="category-icon">⛽</div>
+      <div class="category-text">
+        <strong>الوقود والغاز</strong>
+        <span>محطات الوقود والغاز</span>
+      </div>
+    </button>
+
+    <button class="category" data-category="market">
+      <div class="category-icon">🛒</div>
+      <div class="category-text">
+        <strong>الأسواق</strong>
+        <span>أسواق ومحلات وخدمات</span>
+      </div>
+    </button>
+
+    <button class="category" data-category="transport">
+      <div class="category-icon">🚕</div>
+      <div class="category-text">
+        <strong>النقل والساحبات</strong>
+        <span>النقل والمواصلات</span>
+      </div>
+    </button>
+
+    <button class="category" data-category="roads">
+      <div class="category-icon">🚧</div>
+      <div class="category-text">
+        <strong>الطرق والتنبيهات</strong>
+        <span>حالة الطرق والتنبيهات</span>
+      </div>
+    </button>
+
+    <button class="category" data-category="tourism">
+      <div class="category-icon">🏛️</div>
+      <div class="category-text">
+        <strong>السياحة والتاريخ</strong>
+        <span>أماكن سياحية وتاريخية</span>
+      </div>
+    </button>
+
+    <button class="category" data-category="religion">
+      <div class="category-icon">🕌</div>
+      <div class="category-text">
+        <strong>الدين</strong>
+        <span>مساجد وأماكن دينية</span>
+      </div>
+    </button>
+
+    <button class="category" data-category="stay">
+      <div class="category-icon">🏨</div>
+      <div class="category-text">
+        <strong>الإقامة</strong>
+        <span>فنادق ونزل وأماكن إقامة</span>
+      </div>
+    </button>
+
+    <button class="category" data-category="food">
+      <div class="category-icon">🍽️</div>
+      <div class="category-text">
+        <strong>المطاعم</strong>
+        <span>مطاعم ومقاهٍ</span>
+      </div>
+    </button>
+
+  </aside>
+
+  <!-- الخريطة -->
+  <div id="map"></div>
+
+  <!-- زر تحديد الموقع -->
+  <button class="locate-btn" id="locateBtn" title="تحديد موقعي">
+    📍
+  </button>
+
+  <!-- بطاقة المعلومات -->
+  <div class="bottom-panel">
+
+    <div class="info-card">
+
+      <strong id="infoTitle">
+        مرحبًا بك في دليل الجبل الغربي
+      </strong>
+
+      <p id="infoText">
+        اختر قسمًا من القائمة أو ابحث عن مكان للوصول إلى المعلومات.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- Leaflet -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+
+    /*
+     * =========================================
+     * دليل الجبل الغربي
+     * النسخة الأساسية للنشر على GitHub Pages
+     * =========================================
+     */
+
+    // إحداثيات تقريبية لمنطقة الجبل الغربي
+    const WESTERN_MOUNTAINS = [32.25, 12.85];
+
+    // إنشاء الخريطة
+    const map = L.map("map", {
+      zoomControl: true
+    }).setView(WESTERN_MOUNTAINS, 9);
+
+    // خريطة OpenStreetMap
+    L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+      }
+    ).addTo(map);
+
+
+    // =========================================
+    // بيانات الأماكن
+    // =========================================
+
+    const places = [
+
+      {
+        name: "غريان",
+        category: "tourism",
+        lat: 32.172,
+        lng: 13.020,
+        description: "مدينة غريان من أبرز مدن الجبل الغربي."
+      },
+
+      {
+        name: "نالوت",
+        category: "tourism",
+        lat: 31.868,
+        lng: 10.982,
+        description: "مدينة نالوت التاريخية في الجبل الغربي."
+      },
+
+      {
+        name: "يفرن",
+        category: "tourism",
+        lat: 32.062,
+        lng: 12.528,
+        description: "مدينة يفرن من مدن الجبل الغربي."
+      },
+
+      {
+        name: "الزنتان",
+        category: "tourism",
+        lat: 31.931,
+        lng: 12.250,
+        description: "مدينة الزنتان."
+      },
+
+      {
+        name: "جادو",
+        category: "tourism",
+        lat: 31.955,
+        lng: 12.026,
+        description: "مدينة جادو."
+      },
+
+      {
+        name: "كاباو",
+        category: "tourism",
+        lat: 31.855,
+        lng: 11.554,
+        description: "مدينة كاباو التاريخية."
+      },
+
+      {
+        name: "مستشفى",
+        category: "health",
+        lat: 32.17,
+        lng: 13.01,
+        description: "خدمة صحية - يرجى التأكد من بيانات المنشأة قبل الاعتماد عليها."
+      },
+
+      {
+        name: "محطة وقود",
+        category: "fuel",
+        lat: 32.18,
+        lng: 13.00,
+        description: "محطة وقود."
+      },
+
+      {
+        name: "سوق محلي",
+        category: "market",
+        lat: 32.16,
+        lng: 13.02,
+        description: "سوق وخدمات محلية."
+      },
+
+      {
+        name: "مطعم",
+        category: "food",
+        lat: 32.175,
+        lng: 13.025,
+        description: "مطعم محلي."
+      },
+
+      {
+        name: "مسجد",
+        category: "religion",
+        lat: 32.165,
+        lng: 13.015,
+        description: "مسجد."
+      },
+
+      {
+        name: "فندق",
+        category: "stay",
+        lat: 32.17,
+        lng: 13.03,
+        description: "مكان إقامة."
+      }
+
+    ];
+
+
+    // =========================================
+    // الرموز
+    // =========================================
+
+    const icons = {
+      health: "🏥",
+      fuel: "⛽",
+      market: "🛒",
+      transport: "🚕",
+      roads: "🚧",
+      tourism: "🏛️",
+      religion: "🕌",
+      stay: "🏨",
+      food: "🍽️"
+    };
+
+
+    // =========================================
+    // إضافة العلامات
+    // =========================================
+
+    const markers = [];
+
+    places.forEach(place => {
+
+      const marker = L.marker([
+        place.lat,
+        place.lng
+      ]);
+
+      marker.placeData = place;
+
+      marker.bindPopup(`
+        <div style="text-align:right;min-width:180px">
+          <h3 style="margin:0 0 8px;color:#173f35">
+            ${icons[place.category] || "📍"} ${place.name}
+          </h3>
+
+          <p style="margin:0 0 10px;color:#555">
+            ${place.description}
+          </p>
+
+          <button
+            onclick="focusPlace(${place.lat},${place.lng})"
+            style="
+              border:0;
+              background:#173f35;
+              color:white;
+              padding:8px 12px;
+              border-radius:8px;
+              cursor:pointer;
+            "
+          >
+            عرض على الخريطة
+          </button>
+        </div>
+      `);
+
+      markers.push(marker);
+      marker.addTo(map);
+    });
+
+
+    // =========================================
+    // التركيز على مكان
+    // =========================================
+
+    function focusPlace(lat, lng) {
+
+      map.setView(
+        [lat, lng],
+        14,
+        {
+          animate: true
+        }
+      );
+
+    }
+
+
+    // =========================================
+    // تصفية الأقسام
+    // =========================================
+
+    document.querySelectorAll(".category").forEach(button => {
+
+      button.addEventListener("click", () => {
+
+        const category = button.dataset.category;
+
+        markers.forEach(marker => {
+
+          const place = marker.placeData;
+
+          if (
+            category === "all" ||
+            place.category === category
+          ) {
+
+            if (!map.hasLayer(marker)) {
+              marker.addTo(map);
+            }
+
+          } else {
+
+            if (map.hasLayer(marker)) {
+              map.removeLayer(marker);
+            }
+
+          }
+
+        });
+
+
+        const names = {
+          all: "جميع الأماكن",
+          health: "الصحة",
+          fuel: "الوقود والغاز",
+          market: "الأسواق",
+          transport: "النقل والساحبات",
+          roads: "الطرق والتنبيهات",
+          tourism: "السياحة والتاريخ",
+          religion: "الدين",
+          stay: "الإقامة",
+          food: "المطاعم"
+        };
+
+        document.getElementById("infoTitle").textContent =
+          names[category] || "دليل الجبل الغربي";
+
+        document.getElementById("infoText").textContent =
+          "تم عرض الأماكن الخاصة بهذا القسم على الخريطة.";
+
+        // إغلاق القائمة على الهاتف
+        if (window.innerWidth <= 800) {
+          document.getElementById("sidebar")
+            .classList.remove("open");
+        }
+
+      });
+
+    });
+
+
+    // =========================================
+    // البحث
+    // =========================================
+
+    const searchInput =
+      document.getElementById("searchInput");
+
+    const searchResults =
+      document.getElementById("searchResults");
+
+
+    searchInput.addEventListener("input", () => {
+
+      const query =
+        searchInput.value.trim().toLowerCase();
+
+      searchResults.innerHTML = "";
+
+      if (!query) {
+        searchResults.style.display = "none";
+        return;
+      }
+
+      const results = places.filter(place =>
+        place.name.toLowerCase().includes(query) ||
+        place.description.toLowerCase().includes(query)
+      );
+
+      if (results.length === 0) {
+
+        searchResults.innerHTML = `
+          <div class="result">
+            <strong>لا توجد نتائج</strong>
+            <span>جرّب كلمة بحث أخرى</span>
+          </div>
+        `;
+
+      } else {
+
+        results.forEach(place => {
+
+          const item =
+            document.createElement("div");
+
+          item.className = "result";
+
+          item.innerHTML = `
+            <strong>
+              ${icons[place.category] || "📍"}
+              ${place.name}
+            </strong>
+
+            <span>
+              ${place.description}
+            </span>
+          `;
+
+          item.addEventListener("click", () => {
+
+            focusPlace(place.lat, place.lng);
+
+            markers.forEach(marker => {
+
+              if (marker.placeData === place) {
+                marker.openPopup();
+              }
+
+            });
+
+            searchResults.style.display = "none";
+            searchInput.value = place.name;
+
+          });
+
+          searchResults.appendChild(item);
+
+        });
+
+      }
+
+      searchResults.style.display = "block";
+
+    });
+
+
+    // إغلاق نتائج البحث عند الضغط خارجها
+    document.addEventListener("click", event => {
+
+      if (
+        !event.target.closest(".search-box")
+      ) {
+        searchResults.style.display = "none";
+      }
+
+    });
+
+
+    // =========================================
+    // تحديد موقع المستخدم
+    // =========================================
+
+    document
+      .getElementById("locateBtn")
+      .addEventListener("click", () => {
+
+        if (!navigator.geolocation) {
+
+          alert(
+            "المتصفح لا يدعم تحديد الموقع."
+          );
+
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+
+          position => {
+
+            const lat =
+              position.coords.latitude;
+
+            const lng =
+              position.coords.longitude;
+
+            map.setView(
+              [lat, lng],
+              15,
+              {
+                animate: true
+              }
+            );
+
+            L.marker([lat, lng])
+              .addTo(map)
+              .bindPopup(
+                "📍 موقعك الحالي"
+              )
+              .openPopup();
+
+            document.getElementById(
+              "infoTitle"
+            ).textContent =
+              "تم تحديد موقعك";
+
+            document.getElementById(
+              "infoText"
+            ).textContent =
+              "تم نقل الخريطة إلى موقعك الحالي.";
+
+          },
+
+          () => {
+
+            alert(
+              "تعذر الحصول على موقعك. تأكد من السماح للموقع في المتصفح."
+            );
+
+          },
+
+          {
+            enableHighAccuracy: true,
+            timeout: 10000
+          }
+
+        );
+
+      });
+
+
+    // =========================================
+    // الوضع الليلي
+    // =========================================
+
+    document
+      .getElementById("darkBtn")
+      .addEventListener("click", () => {
+
+        document.body.classList.toggle("dark");
+
+        const dark =
+          document.body.classList.contains("dark");
+
+        document.getElementById("darkBtn")
+          .textContent = dark ? "☀️" : "🌙";
+
+        localStorage.setItem(
+          "westernMountainDark",
+          dark ? "1" : "0"
+        );
+
+      });
+
+
+    // استرجاع الوضع الليلي
+    if (
+      localStorage.getItem(
+        "westernMountainDark"
+      ) === "1"
+    ) {
+
+      document.body.classList.add("dark");
+
+      document.getElementById("darkBtn")
+        .textContent = "☀️";
+
+    }
+
+
+    // =========================================
+    // القائمة على الهاتف
+    // =========================================
+
+    document
+      .getElementById("menuBtn")
+      .addEventListener("click", () => {
+
+        document
+          .getElementById("sidebar")
+          .classList.toggle("open");
+
+      });
+
+
+    // =========================================
+    // إزالة شاشة التحميل
+    // =========================================
+
+    window.addEventListener("load", () => {
+
+      setTimeout(() => {
+
+        document
+          .getElementById("loading")
+          .classList.add("hidden");
+
+      }, 700);
+
+    });
+
+
+    // =========================================
+    // إصلاح حجم الخريطة
+    // =========================================
+
+    setTimeout(() => {
+
+      map.invalidateSize();
+
+    }, 1000);
+
+
+    // =========================================
+    // رسالة البداية
+    // =========================================
+
+    console.log(
+      "دليل الجبل الغربي - تم تحميل الموقع بنجاح"
+    );
+
+  </script>
+
+</body>
+</html>
