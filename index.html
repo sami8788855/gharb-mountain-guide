@@ -6,395 +6,90 @@
 
 <title>دليل الجبل الغربي</title>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-
 <style>
-
-*{
- box-sizing:border-box;
-}
-
 body{
- margin:0;
- font-family:Arial,Tahoma,sans-serif;
- background:#f2f4f3;
- color:#222;
+    margin:0;
+    font-family:Arial;
+    background:#f2f2f2;
 }
-
-
-/* الرأس */
 
 header{
- height:60px;
- background:#174734;
- color:white;
- display:flex;
- align-items:center;
- justify-content:space-between;
- padding:0 12px;
- position:fixed;
- top:0;
- right:0;
- left:0;
- z-index:1000;
+    background:#174734;
+    color:white;
+    padding:15px;
+    text-align:center;
+    font-size:22px;
 }
 
-
-header h1{
- font-size:18px;
- margin:0;
+.menu{
+    background:white;
+    margin:15px;
+    padding:15px;
+    border-radius:10px;
 }
-
 
 button{
- cursor:pointer;
- border:none;
+    background:#174734;
+    color:white;
+    border:0;
+    padding:10px;
+    border-radius:8px;
 }
-
-
-.menu-btn{
- background:white;
- color:#174734;
- border-radius:8px;
- padding:8px 14px;
- font-size:20px;
-}
-
-
-.search{
- width:180px;
- padding:8px;
- border-radius:20px;
- border:none;
-}
-
-
-/* القائمة */
-
-.sidebar{
-
- position:fixed;
- top:60px;
- right:-280px;
- width:270px;
- bottom:0;
- background:white;
- z-index:2000;
- padding:15px;
- box-shadow:0 0 12px #777;
- transition:.3s;
-
-}
-
-
-.sidebar.open{
- right:0;
-}
-
-
-.sidebar h2{
- color:#174734;
-}
-
-
-.service{
-
- background:#174734;
- color:white;
- padding:12px;
- margin:8px 0;
- border-radius:10px;
-
-}
-
-
-/* مساحة الموقع */
-
-.container{
-
- padding-top:75px;
- width:95%;
- margin:auto;
-
-}
-
-
-/* الخريطة الصغيرة */
-
-.map-box{
-
- height:55vh;
- width:100%;
- border-radius:18px;
- overflow:hidden;
- box-shadow:0 3px 12px #aaa;
- background:white;
-
-}
-
 
 #map{
-
- height:100%;
- width:100%;
-
+    margin:15px;
+    height:300px;
+    background:#ddd;
+    border-radius:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:25px;
 }
 
-
-
-/* بطاقة المعلومات */
-
-.info{
-
- margin-top:15px;
- background:white;
- border-radius:15px;
- padding:15px;
- text-align:center;
- box-shadow:0 2px 8px #ccc;
-
+.card{
+    background:white;
+    margin:15px;
+    padding:15px;
+    border-radius:10px;
 }
-
-
-.info h3{
- color:#174734;
- margin-top:0;
-}
-
-
-
-@media(max-width:600px){
-
- header h1{
-  font-size:14px;
- }
-
- .search{
-  width:110px;
- }
-
- .map-box{
-  height:50vh;
- }
-
-}
-
 
 </style>
 
 </head>
 
-
 <body>
 
-
 <header>
-
-<button class="menu-btn" onclick="openMenu()">
-☰
-</button>
-
-
-<h1>
 ⛰️ دليل الجبل الغربي
-</h1>
-
-
-<input class="search" placeholder="بحث">
-
-
 </header>
 
 
+<div class="menu">
 
-<div class="sidebar" id="sidebar">
-
-<h2>
-الخدمات
-</h2>
-
-
-<div class="service">
-🏥 الصحة
-</div>
-
-
-<div class="service">
-⛽ الوقود والغاز
-</div>
-
-
-<div class="service">
-🛒 الأسواق
-</div>
-
-
-<div class="service">
-🚕 النقل
-</div>
-
-
-<div class="service">
-🏛️ السياحة
-</div>
-
-
-<div class="service">
-🕌 الدين
-</div>
-
-
-<div class="service">
-🏨 الإقامة
-</div>
-
-
-<div class="service">
-🍽️ المطاعم
-</div>
-
+<button onclick="alert('الخدمات تعمل')">
+☰ الخدمات
+</button>
 
 </div>
 
 
-
-
-<div class="container">
-
-
-<div class="map-box">
-
-<div id="map"></div>
-
+<div id="map">
+🗺️ مكان الخريطة
 </div>
 
 
+<div class="card">
 
-<div class="info">
+<h3>الخدمات</h3>
 
-<h3>
-مرحبا بك في دليل الجبل الغربي
-</h3>
-
-<p>
-استخدم الخريطة لاستكشاف المدن والخدمات.
-</p>
-
-</div>
-
+<p>🏥 الصحة</p>
+<p>⛽ الوقود</p>
+<p>🛒 الأسواق</p>
+<p>🏨 الإقامة</p>
+<p>🍽️ المطاعم</p>
 
 </div>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-<script>
-
-// فتح وإغلاق القائمة
-
-function openMenu(){
-
-    document
-    .getElementById("sidebar")
-    .classList
-    .toggle("open");
-
-}
-
-
-
-// إنشاء الخريطة
-
-var map = L.map("map")
-.setView([32.17,13.02],8);
-
-
-// طبقة الخريطة
-
-L.tileLayer(
-"https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-{
- attribution:"OpenStreetMap"
-}
-).addTo(map);
-
-
-
-// مدن الجبل الغربي
-
-var cities=[
-
-{
-name:"غريان",
-lat:32.172,
-lng:13.02
-},
-
-{
-name:"يفرن",
-lat:32.063,
-lng:12.528
-},
-
-{
-name:"الزنتان",
-lat:31.93,
-lng:12.25
-},
-
-{
-name:"نالوت",
-lat:31.86,
-lng:10.98
-},
-
-{
-name:"جادو",
-lat:31.95,
-lng:12.02
-}
-
-];
-
-
-
-// إضافة العلامات
-
-cities.forEach(function(city){
-
-L.marker(
-[
-city.lat,
-city.lng
-]
-
-)
-
-.addTo(map)
-
-.bindPopup(
-"<h3>"+city.name+"</h3>"+
-"<p>مدينة من مدن الجبل الغربي</p>"
-);
-
-});
-
-
-
-// إصلاح حجم الخريطة بعد التحميل
-
-setTimeout(function(){
-
-map.invalidateSize();
-
-},500);
-
-
-
-console.log(
-"دليل الجبل الغربي يعمل"
-);
-
-
-</script>
 
 
 </body>
