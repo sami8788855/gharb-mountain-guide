@@ -3,62 +3,328 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>دليل الجبل الغربي</title>
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
 <style>
+
 body{
-  margin:0;
-  font-family:Arial;
-  background:#f2f2f2;
-  text-align:center;
+    margin:0;
+    font-family:Arial,Tahoma,sans-serif;
+    background:#f5f5f5;
 }
 
 header{
-  background:#174734;
-  color:white;
-  padding:20px;
-  font-size:24px;
+    height:60px;
+    background:#174734;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 15px;
+    position:fixed;
+    top:0;
+    right:0;
+    left:0;
+    z-index:1000;
 }
 
-.box{
-  margin:30px auto;
-  width:85%;
-  background:white;
-  padding:20px;
-  border-radius:15px;
-  box-shadow:0 3px 10px #aaa;
+header h1{
+    font-size:20px;
+    margin:0;
 }
 
-button{
-  background:#174734;
-  color:white;
-  border:0;
-  padding:12px 25px;
-  border-radius:10px;
-  font-size:16px;
+.search{
+    width:220px;
+    padding:8px;
+    border-radius:20px;
+    border:0;
 }
+
+.menu-btn{
+    background:white;
+    color:#174734;
+    border:0;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+
+#map{
+    position:fixed;
+    top:60px;
+    bottom:0;
+    right:0;
+    left:0;
+}
+
+
+.sidebar{
+
+    position:fixed;
+    top:60px;
+    right:-300px;
+    width:280px;
+    bottom:0;
+    background:white;
+    z-index:2000;
+    transition:.3s;
+    padding:15px;
+    box-shadow:0 0 10px #777;
+
+}
+
+
+.sidebar.open{
+    right:0;
+}
+
+
+.service{
+
+    background:#174734;
+    color:white;
+    padding:12px;
+    margin:10px 0;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+
+.info{
+
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    left:20px;
+    background:white;
+    padding:15px;
+    border-radius:15px;
+    z-index:1500;
+    text-align:center;
+    box-shadow:0 2px 10px #999;
+
+}
+
+
+@media(max-width:600px){
+
+.search{
+    width:120px;
+}
+
+header h1{
+    font-size:15px;
+}
+
+}
+
 </style>
 
 </head>
 
+
 <body>
 
+
 <header>
+
+<button class="menu-btn" onclick="openMenu()">
+☰
+</button>
+
+
+<h1>
 ⛰️ دليل الجبل الغربي
+</h1>
+
+
+<input class="search" placeholder="بحث">
+
+
 </header>
 
-<div class="box">
-<h2>مرحبًا بك</h2>
 
-<p>
-هذه النسخة التجريبية تعمل على GitHub Pages.
-</p>
 
-<button onclick="alert('يعمل بنجاح')">
-اختبار الزر
-</button>
+<div id="map"></div>
+
+
+
+<div class="sidebar" id="sidebar">
+
+<h2>
+الخدمات
+</h2>
+
+
+<div class="service">
+🏥 الصحة
+</div>
+
+
+<div class="service">
+⛽ الوقود والغاز
+</div>
+
+
+<div class="service">
+🛒 الأسواق
+</div>
+
+
+<div class="service">
+🚕 النقل
+</div>
+
+
+<div class="service">
+🏛️ السياحة والتاريخ
+</div>
+
+
+<div class="service">
+🕌 المساجد
+</div>
+
+
+<div class="service">
+🏨 الإقامة
+</div>
+
+
+<div class="service">
+🍽️ المطاعم
+</div>
+
 
 </div>
 
+
+
+<div class="info">
+
+<strong>
+مرحبًا بك في دليل الجبل الغربي
+</strong>
+
+<br>
+
+اختر خدمة من القائمة أو استخدم الخريطة
+
+</div>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+
+
+// فتح وإغلاق قائمة الخدمات
+
+function openMenu(){
+
+    document
+    .getElementById("sidebar")
+    .classList
+    .toggle("open");
+
+}
+
+
+
+// إنشاء الخريطة
+
+var map = L.map('map')
+.setView([32.17,13.02],9);
+
+
+// إضافة خريطة OpenStreetMap
+
+L.tileLayer(
+'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+    attribution:'OpenStreetMap'
+}
+).addTo(map);
+
+
+
+// أماكن الجبل الغربي
+
+var places=[
+
+{
+name:"غريان",
+lat:32.172,
+lng:13.02
+},
+
+{
+name:"نالوت",
+lat:31.86,
+lng:10.98
+},
+
+{
+name:"يفرن",
+lat:32.06,
+lng:12.53
+},
+
+{
+name:"الزنتان",
+lat:31.93,
+lng:12.25
+},
+
+{
+name:"جادو",
+lat:31.95,
+lng:12.02
+}
+
+];
+
+
+
+// إضافة العلامات على الخريطة
+
+places.forEach(function(place){
+
+
+L.marker(
+[
+place.lat,
+place.lng
+]
+
+)
+
+.addTo(map)
+
+.bindPopup(
+
+"<h3>"+place.name+"</h3>"+
+"<p>من مدن الجبل الغربي</p>"
+
+);
+
+
+});
+
+
+
+// اختبار تحميل الصفحة
+
+console.log(
+"دليل الجبل الغربي يعمل بنجاح"
+);
+
+
+</script>
+
+
 </body>
+
 </html>
